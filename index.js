@@ -1,16 +1,15 @@
 const express = require("express");
 const axios = require("axios");
-require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 
-// LOGS
+// Logs
 console.log("INSTANCE_ID:", process.env.INSTANCE_ID);
 console.log("ZAPI_TOKEN:", process.env.ZAPI_TOKEN);
 console.log("CLIENT_TOKEN:", process.env.CLIENT_TOKEN);
 
-// CONFIG
+// Config Z-API
 const INSTANCE_ID = process.env.INSTANCE_ID;
 const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
@@ -23,12 +22,12 @@ const API = axios.create({
   },
 });
 
-// TESTE API
+// Teste
 app.get("/", (req, res) => {
   res.send("API rodando no Railway! 🚀");
 });
 
-// WEBHOOK
+// Webhook
 app.post("/webhook", async (req, res) => {
   console.log("📩 Webhook recebido:", req.body);
 
@@ -42,7 +41,7 @@ app.post("/webhook", async (req, res) => {
   try {
     await API.post("/send-text", {
       phone: telefone,
-      message: `Recebi: ${mensagem}`,
+      message: `Recebi sua mensagem: ${mensagem}`,
     });
 
     res.sendStatus(200);
@@ -52,7 +51,7 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-// RODA O SERVIDOR NA PORTA 3000
+// Porta dinâmica
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor iniciado na porta ${PORT}`);
