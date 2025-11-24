@@ -10,7 +10,7 @@ app.use(cors());
 // VARIÁVEIS DO RAILWAY
 // ================================
 const INSTANCE = process.env.INSTANCE;
-const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
+const ZAPI_TOKEN = process.env.ZAPI_TOKEN;   // 👈 VOCÊ pediu assim
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 
 console.log("INSTANCE:", INSTANCE);
@@ -37,7 +37,6 @@ async function sendText(phone, message) {
       phone,
       message
     });
-
     console.log("📤 Mensagem enviada:", response.data);
   } catch (error) {
     console.error("❌ Erro ao enviar mensagem:", error?.response?.data || error.message);
@@ -57,8 +56,6 @@ app.post("/webhook", async (req, res) => {
       const phone = msg.phone;
       const text = msg.text.message.trim().toLowerCase();
 
-      console.log(`📥 Mensagem recebida de ${phone}: ${text}`);
-
       if (text === "oi" || text === "olá") {
         await sendText(phone, "Olá! Eu sou o bot da Ameclin 😄 Como posso ajudar?");
       } else {
@@ -67,7 +64,6 @@ app.post("/webhook", async (req, res) => {
     }
 
     return res.sendStatus(200);
-
   } catch (error) {
     console.error("❌ Erro no webhook:", error.message);
     return res.sendStatus(500);
