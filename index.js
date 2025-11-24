@@ -13,13 +13,19 @@ const INSTANCE = process.env.INSTANCE;
 const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 
-// Log para debug
+console.log("===============================");
 console.log("🔧 INSTANCE:", INSTANCE);
 console.log("🔧 ZAPI_TOKEN:", ZAPI_TOKEN);
 console.log("🔧 CLIENT_TOKEN:", CLIENT_TOKEN);
+console.log("===============================");
+
+// Verifica se as variáveis existem
+if (!INSTANCE || !ZAPI_TOKEN || !CLIENT_TOKEN) {
+  console.error("❌ ERRO: Variáveis de ambiente não configuradas no Railway!");
+}
 
 // ================================
-// API DA Z-API
+// CLIENTE API Z-API
 // ================================
 const API = axios.create({
   baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
@@ -34,10 +40,14 @@ const API = axios.create({
 // ================================
 async function sendText(phone, message) {
   try {
-    const response = await API.post("send-text", { phone, message });
-    console.log("📤 Enviado:", response.data);
+    const response = await API.post("send-text", {
+      phone,
+      message
+    });
+
+    console.log("📤 Mensagem enviada:", response.data);
   } catch (error) {
-    console.error("❌ Erro:", error?.response?.data || error.message);
+    console.error("❌ Erro ao enviar mensagem:", error.response?.data || error.message);
   }
 }
 
@@ -54,6 +64,8 @@ app.post("/webhook", async (req, res) => {
       const phone = msg.phone;
       const text = msg.text.message.trim().toLowerCase();
 
+      console.log(`📥 Mensagem recebida de ${phone}: ${text}`);
+
       if (text === "oi" || text === "olá") {
         await sendText(phone, "Olá! Eu sou o bot da Ameclin 😄 Como posso ajudar?");
       } else {
@@ -61,15 +73,16 @@ app.post("/webhook", async (req, res) => {
       }
     }
 
-    res.sendStatus(200);
+    return res.sendStatus(200);
+
   } catch (error) {
-    console.error("❌ Erro Webhook:", error.message);
-    res.sendStatus(500);
+    console.error("❌ Erro no webhook:", error.message);
+    return res.sendStatus(500);
   }
 });
 
 // ================================
-// SERVIDOR
+// INICIA SERVIDOR
 // ================================
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
