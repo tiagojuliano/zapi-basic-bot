@@ -1,6 +1,7 @@
 {
-  "name": "zapi-railway",
+  "name": "zapi-bot",
   "version": "1.0.0",
+  "description": "Bot para integração com a Z-API",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
