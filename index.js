@@ -1,81 +1,48 @@
 const express = require("express");
 const axios = require("axios");
-const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
 
-// ================================
-// VARIÁVEIS DO RAILWAY
-// ================================
-const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
-const ZAPI_TOKEN = "389FF465021471C494497363";
-const CLIENT_TOKEN = "F6045b2209bb8413b91d476ddb10106aeS";
+// Configurações da Z-API
+const INSTANCE_ID = process.env.INSTANCE_ID; // ID da instância
+const ZAPI_TOKEN = process.env.ZAPI_TOKEN; // Token da instância
+const CLIENT_TOKEN = process.env.CLIENT_TOKEN; // Client-token
 
-
-
-// ================================
-// CLIENTE API Z-API
-// ================================
+// Base URL da API
 const API = axios.create({
-  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
+  baseURL: `https://api.z-api.io/instances/${INSTANCE_ID}/token/${ZAPI_TOKEN}`,
   headers: {
     "Content-Type": "application/json",
-    "client-token": CLIENT_TOKEN
+    "client-token": CLIENT_TOKEN,
+  },
+});
+
+// Rota para enviar mensagem
+app.post("/send-message", async (req, res) => {
+  const { phone, message } = req.body;
+
+  if (!phone || !message) {
+    return res.status(400).json({ error: "Número e mensagem são obrigatórios!" });
+  }
+
+  try {
+    const response = await API.post("/send-text", { phone, message });
+    res.status(200).json({ success: true, data: response.data });
+  } catch (error) {
+    console.error("Erro ao enviar mensagem:", error.response?.data || error.message);
+    res.status(500).json({ error: "Erro ao enviar mensagem", details: error.response?.data || error.message });
   }
 });
 
-// ================================
-// FUNÇÃO PARA ENVIAR MENSAGEM
-// ================================
-async function sendText(phone, message) {
-  try {
-    const response = await API.post("send-text", {
-      phone,
-      message
-    });
-
-    console.log("📤 Mensagem enviada:", response.data);
-  } catch (error) {
-    console.error("❌ Erro ao enviar mensagem:", error.response?.data || error.message);
-  }
-}
-
-// ================================
-// WEBHOOK
-// ================================
-app.post("/webhook", async (req, res) => {
-  console.log("📩 Webhook recebido:", JSON.stringify(req.body, null, 2));
-
-  try {
-    const msg = req.body;
-
-    if (msg?.phone && msg?.text?.message) {
-      const phone = msg.phone;
-      const text = msg.text.message.trim().toLowerCase();
-
-      console.log(`📥 Mensagem recebida de ${phone}: ${text}`);
-
-      if (text === "oi" || text === "olá") {
-        await sendText(phone, "Olá! Eu sou o bot da Ameclin 😄 Como posso ajudar?");
-      } else {
-        await sendText(phone, "Desculpe, não entendi. Pode repetir?");
-      }
-    }
-
-    return res.sendStatus(200);
-
-  } catch (error) {
-    console.error("❌ Erro no webhook:", error.message);
-    return res.sendStatus(500);
-  }
+// Rota de teste
+app.get("/", (req, res) => {
+  res.send("API Z-API está funcionando! 🚀");
 });
 
-// ================================
-// INICIA SERVIDOR
-// ================================
+// Inicia o servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
