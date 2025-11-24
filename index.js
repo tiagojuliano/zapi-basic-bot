@@ -7,13 +7,14 @@ app.use(express.json());
 app.use(cors());
 
 // ================================
-// CONFIG Z-API MULTI DEVICE
+// VARIÁVEIS DA SUA INSTÂNCIA
 // ================================
 const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
 const ZAPI_TOKEN = "BFA60483E1977233B370D94A";
 
+// URL EXATA, IGUAL AO PAINEL DA Z-API
 const API = axios.create({
-  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}`,
+  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
   headers: {
     "Content-Type": "application/json",
     "client-token": ZAPI_TOKEN
@@ -21,20 +22,18 @@ const API = axios.create({
 });
 
 // ================================
-// ENVIAR TEXTO — MULTI DEVICE NOVO FORMATO
+// ENVIAR TEXTO
 // ================================
 async function sendText(phone, message) {
   try {
-    const response = await API.post("/messages", {
+    const r = await API.post("send-text", {
       phone,
-      message: {
-        text: message
-      }
+      message
     });
 
-    console.log("📤 Enviado OK:", response.data);
-  } catch (error) {
-    console.error("❌ Erro ao enviar:", error?.response?.data || error.message);
+    console.log("📤 Enviado OK:", r.data);
+  } catch (err) {
+    console.log("❌ Erro ao enviar:", err?.response?.data || err.message);
   }
 }
 
@@ -44,13 +43,13 @@ async function sendText(phone, message) {
 app.post("/webhook", async (req, res) => {
   console.log("📩 Webhook recebido:", JSON.stringify(req.body, null, 2));
 
-  const msg = req.body;
+  const m = req.body;
 
-  if (msg?.phone && msg?.text?.message) {
-    const phone = msg.phone;
-    const text = msg.text.message.trim().toLowerCase();
+  if (m?.phone && m?.text?.message) {
+    const phone = m.phone;
+    const text = m.text.message.toLowerCase();
 
-    if (text === "oi" || text === "olá") {
+    if (text === "oi") {
       await sendText(phone, "Olá! Eu sou o bot da Ameclin 😄 Como posso ajudar?");
     } else {
       await sendText(phone, "Desculpe, não entendi. Pode repetir?");
@@ -61,9 +60,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 // ================================
-// INICIAR SERVIDOR
+// SERVIDOR
 // ================================
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-});
+app.listen(PORT, () => console.log("🚀 Rodando na porta", PORT));
