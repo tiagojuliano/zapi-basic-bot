@@ -9,9 +9,9 @@ app.use(cors());
 // ================================
 // VARIÁVEIS DO RAILWAY
 // ================================
-const INSTANCE = process.env.INSTANCE;
-const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
-const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
+const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
+const ZAPI_TOKEN = "389FF465021471C494497363";
+const CLIENT_TOKEN = "F6045b2209bb8413b91d476ddb10106aeS";
 
 console.log("===============================");
 console.log("🔧 INSTANCE:", INSTANCE);
