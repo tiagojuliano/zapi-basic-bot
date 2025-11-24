@@ -6,57 +6,54 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// DADOS DA Z-API (SEM CLIENT-TOKEN)
+// CONFIGS ATUAIS DA SUA INSTÂNCIA
 const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
-const ZAPI_TOKEN = "389FF465021471C494497363";
+const ZAPI_TOKEN = "389FF465021471C494497363"; // token novo
 
-// API BASE CORRETA
+// API format antiga que a sua instância exige
 const API = axios.create({
-  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}`,
+  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
   headers: {
     "Content-Type": "application/json",
-    "client-token": ZAPI_TOKEN
+    "client-token": ZAPI_TOKEN // obrigatório na sua instância
   }
 });
 
-// FUNÇÃO PARA ENVIAR MENSAGEM DE TEXTO
+// ENVIAR TEXTO (API antiga)
 async function sendText(phone, message) {
   try {
-    const response = await API.post("/send-text", { phone, message });
-    console.log("📤 Mensagem enviada:", response.data);
-  } catch (error) {
-    console.error("❌ Erro ao enviar mensagem:", error.response?.data || error.message);
+    const r = await API.post("send-text", {
+      phone,
+      message
+    });
+    console.log("📤 Enviado OK:", r.data);
+  } catch (err) {
+    console.error("❌ Erro ao enviar:", err?.response?.data || err.message);
   }
 }
 
-// Webhook Z-API
+// WEBHOOK
 app.post("/webhook", async (req, res) => {
   console.log("📩 Webhook recebido:", JSON.stringify(req.body, null, 2));
 
-  try {
-    const msg = req.body;
+  const msg = req.body;
 
-    // TELEFONE PODE VIR EM 2 LUGARES
-    const phone = msg.phone || msg.text?.phone;
-    const text = msg.text?.message;
+  const phone = msg.phone;
+  const text = msg.text?.message;
 
-    if (phone && text) {
-      const t = text.trim().toLowerCase();
+  if (phone && text) {
+    const t = text.toLowerCase();
 
-      if (t === "oi" || t === "olá") {
-        await sendText(phone, "Olá! Eu sou o bot da Ameclin 😄 como posso ajudar?");
-      } else {
-        await sendText(phone, "Desculpe, não entendi. Pode repetir?");
-      }
+    if (t === "oi" || t === "olá") {
+      await sendText(phone, "Olá! Eu sou o bot da Ameclin 😄 Como posso ajudar?");
+    } else {
+      await sendText(phone, "Desculpe, não entendi. Pode repetir?");
     }
-
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("❌ Erro no webhook:", error.message);
-    res.sendStatus(500);
   }
+
+  res.sendStatus(200);
 });
 
-// Servidor Railway
+// SERVIDOR
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Rodando na porta ${PORT}`));
