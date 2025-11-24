@@ -10,12 +10,13 @@ app.use(cors());
 // VARIÁVEIS DO RAILWAY
 // ================================
 const INSTANCE = process.env.INSTANCE;
-const ZAPI_TOKEN = process.env.ZAPI_TOKEN;   // 👈 VOCÊ pediu assim
+const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 
-console.log("INSTANCE:", INSTANCE);
-console.log("ZAPI_TOKEN:", ZAPI_TOKEN);
-console.log("CLIENT_TOKEN:", CLIENT_TOKEN);
+// Log para debug
+console.log("🔧 INSTANCE:", INSTANCE);
+console.log("🔧 ZAPI_TOKEN:", ZAPI_TOKEN);
+console.log("🔧 CLIENT_TOKEN:", CLIENT_TOKEN);
 
 // ================================
 // API DA Z-API
@@ -33,13 +34,10 @@ const API = axios.create({
 // ================================
 async function sendText(phone, message) {
   try {
-    const response = await API.post("send-text", {
-      phone,
-      message
-    });
-    console.log("📤 Mensagem enviada:", response.data);
+    const response = await API.post("send-text", { phone, message });
+    console.log("📤 Enviado:", response.data);
   } catch (error) {
-    console.error("❌ Erro ao enviar mensagem:", error?.response?.data || error.message);
+    console.error("❌ Erro:", error?.response?.data || error.message);
   }
 }
 
@@ -63,15 +61,15 @@ app.post("/webhook", async (req, res) => {
       }
     }
 
-    return res.sendStatus(200);
+    res.sendStatus(200);
   } catch (error) {
-    console.error("❌ Erro no webhook:", error.message);
-    return res.sendStatus(500);
+    console.error("❌ Erro Webhook:", error.message);
+    res.sendStatus(500);
   }
 });
 
 // ================================
-// INICIAR SERVIDOR PARA RAILWAY
+// SERVIDOR
 // ================================
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
