@@ -9,8 +9,8 @@ app.use(cors());
 // ================================
 // VARIÁVEIS DO RAILWAY
 // ================================
-const INSTANCE = process.env.INSTANCE;
-const ZAPI_TOKEN = process.env.ZAPI_TOKEN;
+const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
+const ZAPI_TOKEN = "BFA60483E1977233B370D94A";
 
 if (!INSTANCE || !ZAPI_TOKEN) {
   console.error("❌ ERRO: INSTANCE ou ZAPI_TOKEN não configurados.");
