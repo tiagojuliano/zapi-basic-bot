@@ -1,9 +1,14 @@
 const express = require("express");
 const axios = require("axios");
-require("dotenv").config();
+require("dotenv").config(); // Carrega as variáveis de ambiente do arquivo .env
 
 const app = express();
 app.use(express.json());
+
+// Logs para verificar se as variáveis de ambiente estão sendo carregadas
+console.log("🔧 INSTANCE_ID:", process.env.INSTANCE_ID);
+console.log("🔧 ZAPI_TOKEN:", process.env.ZAPI_TOKEN);
+console.log("🔧 CLIENT_TOKEN:", process.env.CLIENT_TOKEN);
 
 // Configurações da Z-API
 const INSTANCE_ID = process.env.INSTANCE_ID; // ID da instância
@@ -31,7 +36,7 @@ app.post("/send-message", async (req, res) => {
     const response = await API.post("/send-text", { phone, message });
     res.status(200).json({ success: true, data: response.data });
   } catch (error) {
-    console.error("Erro ao enviar mensagem:", error.response?.data || error.message);
+    console.error("❌ Erro ao enviar mensagem:", error.response?.data || error.message);
     res.status(500).json({ error: "Erro ao enviar mensagem", details: error.response?.data || error.message });
   }
 });
@@ -44,5 +49,5 @@ app.get("/", (req, res) => {
 // Inicia o servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
