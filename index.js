@@ -13,7 +13,7 @@ const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
 const ZAPI_TOKEN = "BFA60483E1977233B370D94A";
 
 // ================================
-// API DA Z-API (SEM BARRA NO FINAL!)
+// API DA Z-API (MULTI-DEVICE)
 // ================================
 const API = axios.create({
   baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}`,
@@ -24,14 +24,15 @@ const API = axios.create({
 });
 
 // ================================
-// ENVIAR TEXTO
+// ENVIAR TEXTO (MULTI-DEVICE)
 // ================================
 async function sendText(phone, message) {
   try {
-    const response = await API.post("/send-text", {
+    const response = await API.post("/messages/text", {
       phone,
       message
     });
+
     console.log("📤 Enviado OK:", response.data);
   } catch (error) {
     console.error("❌ Erro ao enviar:", error?.response?.data || error.message);
@@ -46,7 +47,7 @@ app.post("/webhook", async (req, res) => {
 
   const msg = req.body;
 
-  if (msg?.phone && msg?.text?.message) {
+  if (msg?.text?.message && msg?.phone) {
     const phone = msg.phone;
     const text = msg.text.message.trim().toLowerCase();
 
