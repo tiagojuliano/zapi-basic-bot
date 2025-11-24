@@ -7,17 +7,19 @@ app.use(express.json());
 app.use(cors());
 
 // ================================
-// CONFIGURAÇÕES DA SUA INSTÂNCIA
+// CONFIG CORRETA — USANDO SEUS DADOS
 // ================================
+
 const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
-const ZAPI_TOKEN = "389FF465021471C494497363"; // token da URL
-const CLIENT_TOKEN = "Fb71ea501d4bd403e931a9077f4677a35S"; // token do header
+const TOKEN = "389FF465021471C494497363";
+const CLIENT_TOKEN = "Fb71ea501d4bd403e931a9077f4677a35S"; // ESTE É O MAIS IMPORTANTE!!!
 
 // ================================
-// CONEXÃO COM A API DA Z-API
+// CLIENT AXIOS CORRETAMENTE MONTADO
 // ================================
+
 const API = axios.create({
-  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
+  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${TOKEN}/`,
   headers: {
     "Content-Type": "application/json",
     "client-token": CLIENT_TOKEN
@@ -25,47 +27,55 @@ const API = axios.create({
 });
 
 // ================================
-// ENVIAR MENSAGEM
+// FUNÇÃO PARA ENVIAR MENSAGEM
 // ================================
+
 async function sendText(phone, message) {
   try {
-    const resp = await API.post("send-text", {
+    const response = await API.post("send-text", {
       phone,
       message
     });
 
-    console.log("📤 Mensagem enviada:", resp.data);
-  } catch (err) {
-    console.error("❌ Erro ao enviar:", err.response?.data || err.message);
+    console.log("📤 Enviado:", response.data);
+
+  } catch (error) {
+    console.error("❌ Erro ao enviar mensagem:", error.response?.data || error.message);
   }
 }
 
 // ================================
 // WEBHOOK
 // ================================
+
 app.post("/webhook", async (req, res) => {
   console.log("📩 Webhook recebido:", JSON.stringify(req.body, null, 2));
 
-  const msg = req.body;
+  try {
+    const msg = req.body;
 
-  const phone = msg.phone;
-  const text = msg.text?.message;
+    if (msg?.phone && msg?.text?.message) {
+      const phone = msg.phone;
+      const text = msg.text.message.trim().toLowerCase();
 
-  if (phone && text) {
-    const t = text.toLowerCase();
-
-    if (t === "oi" || t === "olá") {
-      await sendText(phone, "Olá! Eu sou o bot da Ameclin 😄 Como posso ajudar?");
-    } else {
-      await sendText(phone, "Desculpe, não entendi. Pode repetir?");
+      if (text === "oi") {
+        await sendText(phone, "Olá! 🤖 Estou funcionando!");
+      } else {
+        await sendText(phone, "Não entendi, pode repetir?");
+      }
     }
-  }
 
-  return res.sendStatus(200);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("❌ Erro no webhook:", error);
+    res.sendStatus(500);
+  }
 });
 
 // ================================
-// SERVIDOR
+// SERVER RAILWAY
 // ================================
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});
