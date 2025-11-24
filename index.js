@@ -23,7 +23,7 @@ const API = axios.create({
   baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
   headers: {
     "Content-Type": "application/json",
-    "client-token": ZAPI_TOKEN // OBRIGATÓRIO PARA NÃO DAR ERRO!
+    "client-token": 27007D267B55D0B069029678
   }
 });
 
