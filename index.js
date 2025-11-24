@@ -12,17 +12,17 @@ const ZAPI_TOKEN = "BFA60483E1977233B370D94A";
 
 // API BASE CORRETA
 const API = axios.create({
-  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
-  headers: { "Content-Type": "application/json" }
+  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}`,
+  headers: {
+    "Content-Type": "application/json",
+    "client-token": ZAPI_TOKEN
+  }
 });
 
-// Função para enviar texto
+// FUNÇÃO PARA ENVIAR MENSAGEM DE TEXTO
 async function sendText(phone, message) {
   try {
-    const response = await API.post("send-text", {
-      phone,
-      message
-    });
+    const response = await API.post("/send-text", { phone, message });
     console.log("📤 Mensagem enviada:", response.data);
   } catch (error) {
     console.error("❌ Erro ao enviar mensagem:", error.response?.data || error.message);
