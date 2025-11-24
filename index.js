@@ -7,25 +7,25 @@ app.use(express.json());
 app.use(cors());
 
 // ================================
-// CONFIGURAÇÕES ATUAIS DA SUA INSTÂNCIA
+// CONFIGURAÇÕES DA SUA INSTÂNCIA
 // ================================
-const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D"; 
-const ZAPI_TOKEN = "389FF465021471C494497363";       // token da URL
-const CLIENT_TOKEN = "Fb71ea501d4bd403e931a9077f4677a35S";  // TOKEN QUE FALTAVA!
+const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
+const ZAPI_TOKEN = "389FF465021471C494497363"; // token da URL
+const CLIENT_TOKEN = "Fb71ea501d4bd403e931a9077f4677a35S"; // token do header
 
 // ================================
-// API DA Z-API (FORMATO CORRETO)
+// CONEXÃO COM A API DA Z-API
 // ================================
 const API = axios.create({
   baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${ZAPI_TOKEN}/`,
   headers: {
     "Content-Type": "application/json",
-    "client-token": CLIENT_TOKEN   // AQUI AGORA ESTÁ CERTO!!
+    "client-token": CLIENT_TOKEN
   }
 });
 
 // ================================
-// FUNÇÃO DE ENVIO DE TEXTO
+// ENVIAR MENSAGEM
 // ================================
 async function sendText(phone, message) {
   try {
@@ -35,13 +35,13 @@ async function sendText(phone, message) {
     });
 
     console.log("📤 Mensagem enviada:", resp.data);
-  } catch (error) {
-    console.log("❌ Erro ao enviar:", error.response?.data || error.message);
+  } catch (err) {
+    console.error("❌ Erro ao enviar:", err.response?.data || err.message);
   }
 }
 
 // ================================
-// WEBHOOK RECEBE MENSAGENS
+// WEBHOOK
 // ================================
 app.post("/webhook", async (req, res) => {
   console.log("📩 Webhook recebido:", JSON.stringify(req.body, null, 2));
@@ -49,7 +49,7 @@ app.post("/webhook", async (req, res) => {
   const msg = req.body;
 
   const phone = msg.phone;
-  const text  = msg.text?.message;
+  const text = msg.text?.message;
 
   if (phone && text) {
     const t = text.toLowerCase();
@@ -61,7 +61,7 @@ app.post("/webhook", async (req, res) => {
     }
   }
 
-  res.sendStatus(200);
+  return res.sendStatus(200);
 });
 
 // ================================
