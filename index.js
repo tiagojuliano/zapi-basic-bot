@@ -6,76 +6,62 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ================================
-// CONFIG CORRETA — USANDO SEUS DADOS
-// ================================
-
+// **********************
+// CONFIG DA INSTÂNCIA
+// **********************
 const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
-const TOKEN = "389FF465021471C494497363";
-const CLIENT_TOKEN = "Fb71ea501d4bd403e931a9077f4677a35S"; // ESTE É O MAIS IMPORTANTE!!!
+const API_TOKEN = "389FF465021471C494497363";        // TOKEN DO URL
+const CLIENT_TOKEN = "Fb71ea501d4bd403e931a9077f4677a35S"; // TOKEN DO HEADER — OBRIGATÓRIO
 
-// ================================
-// CLIENT AXIOS CORRETAMENTE MONTADO
-// ================================
-
+// **********************
+// API CLIENT
+// **********************
 const API = axios.create({
-  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${TOKEN}/`,
+  baseURL: `https://api.z-api.io/instances/${INSTANCE}/token/${API_TOKEN}`,
   headers: {
     "Content-Type": "application/json",
     "client-token": CLIENT_TOKEN
   }
 });
 
-// ================================
-// FUNÇÃO PARA ENVIAR MENSAGEM
-// ================================
-
+// **********************
+// ENVIO DE TEXTO
+// **********************
 async function sendText(phone, message) {
   try {
-    const response = await API.post("send-text", {
-      phone,
-      message
-    });
-
-    console.log("📤 Enviado:", response.data);
-
-  } catch (error) {
-    console.error("❌ Erro ao enviar mensagem:", error.response?.data || error.message);
+    const r = await API.post("/send-text", { phone, message });
+    console.log("Mensagem enviada:", r.data);
+  } catch (e) {
+    console.log("Erro:", e.response?.data || e.message);
   }
 }
 
-// ================================
+// **********************
 // WEBHOOK
-// ================================
-
+// **********************
 app.post("/webhook", async (req, res) => {
-  console.log("📩 Webhook recebido:", JSON.stringify(req.body, null, 2));
+  console.log("Webhook recebido:", JSON.stringify(req.body, null, 2));
 
-  try {
-    const msg = req.body;
+  const msg = req.body;
 
-    if (msg?.phone && msg?.text?.message) {
-      const phone = msg.phone;
-      const text = msg.text.message.trim().toLowerCase();
+  if (msg.phone && msg.text?.message) {
+    const phone = msg.phone;
+    const text = msg.text.message.toLowerCase();
 
-      if (text === "oi") {
-        await sendText(phone, "Olá! 🤖 Estou funcionando!");
-      } else {
-        await sendText(phone, "Não entendi, pode repetir?");
-      }
+    if (text === "oi") {
+      await sendText(phone, "Olá! Bot Ameclin aqui 😄 Como posso ajudar?");
+    } else {
+      await sendText(phone, "Desculpe, não entendi.");
     }
-
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("❌ Erro no webhook:", error);
-    res.sendStatus(500);
   }
+
+  res.sendStatus(200);
 });
 
-// ================================
-// SERVER RAILWAY
-// ================================
+// **********************
+// SERVIDOR RAILWAY
+// **********************
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-});
+app.listen(PORT, () =>
+  console.log(`🚀 Servidor rodando na porta ${PORT}`)
+);
