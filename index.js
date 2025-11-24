@@ -11,6 +11,6 @@ import { initQuestions } from './prompt/questions'
  * Então caso não queira utilizado, você pode importar as services e executa-las direto.
  */
 
-const INSTANCE_API = ``
+const INSTANCE_API = `3EA9E26D9B54A1959179B2694663CF7D`
 
 initQuestions(INSTANCE_API)
