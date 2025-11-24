@@ -1,5 +1,5 @@
 {
-  "name": "zapi-bot",
+  "name": "zapi-basic-bot",
   "version": "1.0.0",
   "description": "Bot para integração com a Z-API",
   "main": "index.js",
