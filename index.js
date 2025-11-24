@@ -13,16 +13,7 @@ const INSTANCE = "3EA9E26D9B54A1959179B2694663CF7D";
 const ZAPI_TOKEN = "389FF465021471C494497363";
 const CLIENT_TOKEN = "F6045b2209bb8413b91d476ddb10106aeS";
 
-console.log("===============================");
-console.log("🔧 INSTANCE:", INSTANCE);
-console.log("🔧 ZAPI_TOKEN:", ZAPI_TOKEN);
-console.log("🔧 CLIENT_TOKEN:", CLIENT_TOKEN);
-console.log("===============================");
 
-// Verifica se as variáveis existem
-if (!INSTANCE || !ZAPI_TOKEN || !CLIENT_TOKEN) {
-  console.error("❌ ERRO: Variáveis de ambiente não configuradas no Railway!");
-}
 
 // ================================
 // CLIENTE API Z-API
